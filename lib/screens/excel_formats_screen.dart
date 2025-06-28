@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:excel/excel.dart';
-import 'package:flutter/services.dart';
 import '../models/excel_format.dart';
 import '../data/excel_data.dart';
 import '../services/asset_exporter_service.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:open_filex/open_filex.dart';
+import 'dart:io';
 
 class ExcelFormatsScreen extends StatelessWidget {
   const ExcelFormatsScreen({super.key});
@@ -74,16 +75,22 @@ class ExcelFormatsScreen extends StatelessWidget {
       builder: (context) => AlertDialog(
         backgroundColor: beigeClaro,
         title: Text(
-          'Guardar ${format.name}',
+          format.name,
           style: const TextStyle(color: azulOscuro),
         ),
-        content: const Column(
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'El archivo se guardará en la carpeta de Descargas de tu dispositivo.',
-              style: TextStyle(fontSize: 14, color: azulOscuro),
+              format.description,
+              style: const TextStyle(fontSize: 14, color: azulOscuro),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              '¿Qué deseas hacer con este archivo?',
+              style: TextStyle(
+                  fontSize: 14, color: azulOscuro, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -93,14 +100,26 @@ class ExcelFormatsScreen extends StatelessWidget {
             child: const Text('Cancelar', style: TextStyle(color: azulOscuro)),
           ),
           ElevatedButton.icon(
+            icon: const Icon(Icons.open_in_new, color: beigeClaro),
+            onPressed: () {
+              Navigator.pop(context);
+              _openExcelFromAssets(context, format.localAssetPath);
+            },
+            label: const Text('Abrir', style: TextStyle(color: beigeClaro)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: azulOscuro,
+              foregroundColor: beigeClaro,
+            ),
+          ),
+          ElevatedButton.icon(
             icon: const Icon(Icons.download, color: beigeClaro),
             onPressed: () {
               Navigator.pop(context);
               _exportAsset(context, format.localAssetPath);
             },
-            label: const Text('Guardar', style: TextStyle(color: beigeClaro)),
+            label: const Text('Descargar', style: TextStyle(color: beigeClaro)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: azulOscuro,
+              backgroundColor: const Color.fromARGB(255, 58, 36, 114),
               foregroundColor: beigeClaro,
             ),
           ),
@@ -132,99 +151,50 @@ class ExcelFormatsScreen extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  void _showExcelPreview(BuildContext context, ExcelFormat format) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const AlertDialog(
-        backgroundColor: beigeClaro,
-        content: Row(
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 16),
-            Text('Cargando vista previa...',
-                style: TextStyle(color: azulOscuro)),
-          ],
-        ),
-      ),
-    );
+  // Función para abrir el archivo Excel desde los assets
+  Future<void> _openExcelFromAssets(
+      BuildContext context, String? assetPath) async {
+    if (assetPath == null || assetPath.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('No hay archivo de Excel disponible para este formato.')),
+      );
+      return;
+    }
 
     try {
-      final data = await rootBundle.load(format.localAssetPath);
-      final bytes = data.buffer.asUint8List();
-      final excel = Excel.decodeBytes(bytes);
+      // 1. Cargar el archivo desde los assets como bytes
+      final byteData = await DefaultAssetBundle.of(context).load(assetPath);
+      final bytes = byteData.buffer.asUint8List();
 
-      Navigator.pop(context);
+      // 2. Obtener un directorio temporal para guardar el archivo
+      final tempDir = await getTemporaryDirectory();
+      // Extraer el nombre del archivo de la ruta del asset
+      final fileName = assetPath.split('/').last;
+      final file = File('${tempDir.path}/$fileName');
 
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: beigeClaro,
-          title: Text('Vista Previa: ${format.name}',
-              style: const TextStyle(color: azulOscuro)),
-          content: Container(
-            width: double.maxFinite,
-            height: 400,
-            child: _buildExcelContent(excel),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cerrar', style: TextStyle(color: azulOscuro)),
-            ),
-          ],
-        ),
-      );
+      // 3. Escribir los bytes en el archivo temporal
+      await file.writeAsBytes(bytes, flush: true);
+
+      // 4. Abrir el archivo con la aplicación predeterminada del sistema
+      final result = await OpenFilex.open(file.path);
+
+      if (result.type != ResultType.done) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Error al abrir el archivo: ${result.message}')),
+        );
+      }
     } catch (e) {
-      Navigator.pop(context);
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al cargar el archivo')),
+        SnackBar(
+            content: Text('Ocurrió un error al cargar o abrir el archivo: $e')),
       );
+      print('Error loading/opening Excel file: $e'); // For debugging
     }
   }
 
-  Widget _buildExcelContent(Excel excel) {
-    if (excel.tables.isEmpty) {
-      return const Center(child: Text('El archivo Excel está vacío'));
-    }
-
-    final sheet = excel.tables.values.first;
-
-    if (sheet.rows.isEmpty) {
-      return const Center(child: Text('La hoja de Excel no tiene datos'));
-    }
-
-    final maxCols = sheet.maxColumns > 0 ? sheet.maxColumns : 1;
-    final rows = sheet.rows.take(20).toList();
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SingleChildScrollView(
-        child: DataTable(
-          columns: List.generate(
-            maxCols,
-            (index) => DataColumn(
-              label: Text('Col ${index + 1}',
-                  style: const TextStyle(color: azulOscuro)),
-            ),
-          ),
-          rows: rows.map((row) {
-            return DataRow(
-              cells: List.generate(
-                maxCols,
-                (index) => DataCell(
-                  Text(
-                    row.length > index && row[index]?.value != null
-                        ? row[index]!.value.toString()
-                        : '',
-                    style: const TextStyle(color: azulOscuro),
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
 }
