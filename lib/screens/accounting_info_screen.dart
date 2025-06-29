@@ -40,6 +40,7 @@ class _AccountingInfoScreenState extends State<AccountingInfoScreen> {
       appBar: AppBar(
         title: const Text('Información Contable'),
         elevation: 0,
+        backgroundColor: const Color(0xFF1E88E5),
       ),
       body: Column(
         children: [
@@ -75,7 +76,7 @@ class _AccountingInfoScreenState extends State<AccountingInfoScreen> {
                   margin: const EdgeInsets.only(bottom: 8),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: const Color.fromARGB(255, 13, 28, 53),
+                      backgroundColor: const Color(0xFF1E88E5),
                       child: Text(
                         account.code,
                         style: const TextStyle(

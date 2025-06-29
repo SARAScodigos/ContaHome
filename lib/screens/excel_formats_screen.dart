@@ -9,7 +9,7 @@ import 'dart:io';
 class ExcelFormatsScreen extends StatelessWidget {
   const ExcelFormatsScreen({super.key});
 
-  static const Color azulOscuro = Color.fromARGB(255, 13, 28, 53);
+  static const Color azulOscuro = Color(0xFF8E24AA);
   static const Color beigeClaro = Color.fromARGB(255, 247, 242, 235);
 
   @override
@@ -51,13 +51,13 @@ class ExcelFormatsScreen extends StatelessWidget {
                 format.name,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: azulOscuro,
+                  color: Color.fromARGB(255, 23, 3, 29),
                 ),
               ),
               subtitle: Text(
                 format.description,
                 style: TextStyle(
-                  color: azulOscuro.withOpacity(0.7),
+                  color: const Color.fromARGB(255, 16, 0, 20).withOpacity(0.7),
                 ),
               ),
               onTap: () => _showDownloadConfirmationDialog(context, format),

@@ -17,9 +17,9 @@ class _AccountingExercisesScreenState extends State<AccountingExercisesScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<Exercise> _filteredExercises = [];
 
-  final Color _appBarColor = const Color.fromARGB(255, 13, 28, 53);
+  final Color _appBarColor = const Color(0xFF43A047);
   final Color _cardBackgroundColor = const Color.fromARGB(255, 247, 242, 235);
-  final Color _accentColor = const Color.fromARGB(255, 13, 28, 53);
+  final Color _accentColor = const Color(0xFF43A047);
 
   @override
   void initState() {
@@ -253,9 +253,9 @@ class ExerciseDetailScreen extends StatelessWidget {
     }
   }
 
-  final Color _appBarColor = const Color.fromARGB(255, 13, 28, 53);
+  final Color _appBarColor = const Color(0xFF43A047);
   final Color _cardBackgroundColor = const Color.fromARGB(255, 247, 242, 235);
-  final Color _accentColor = const Color.fromARGB(255, 13, 28, 53);
+  final Color _accentColor = const Color(0xFF43A047);
 
   @override
   Widget build(BuildContext context) {

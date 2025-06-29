@@ -9,6 +9,12 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Definir una paleta de colores para cada tarjeta
+    const infoColor = Color(0xFF1E88E5); // Azul vibrante
+    const ejerciciosColor = Color(0xFF43A047); // Verde
+    const videosColor = Color(0xFFF9A825); // Amarillo
+    const formatosColor = Color(0xFF8E24AA); // Morado
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 247, 242, 235),
       appBar: PreferredSize(
@@ -69,7 +75,7 @@ class HomeScreen extends StatelessWidget {
                       context,
                       'Información\nContable',
                       Icons.info_outline,
-                      const Color.fromARGB(255, 13, 28, 53),
+                      infoColor,
                       () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -81,7 +87,7 @@ class HomeScreen extends StatelessWidget {
                       context,
                       'Ejercicios\nContables',
                       Icons.assignment,
-                      const Color.fromARGB(255, 13, 28, 53),
+                      ejerciciosColor,
                       () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -94,7 +100,7 @@ class HomeScreen extends StatelessWidget {
                       context,
                       'Videos\nExplicativos',
                       Icons.play_circle_outline,
-                      const Color.fromARGB(255, 13, 28, 53),
+                      videosColor,
                       () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -106,7 +112,7 @@ class HomeScreen extends StatelessWidget {
                       context,
                       'Formatos\nÚtiles',
                       Icons.table_chart,
-                      const Color.fromARGB(255, 13, 28, 53),
+                      formatosColor,
                       () => Navigator.push(
                         context,
                         MaterialPageRoute(

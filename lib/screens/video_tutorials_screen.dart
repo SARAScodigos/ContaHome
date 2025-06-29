@@ -5,7 +5,7 @@ import '../data/videos_data.dart';
 class VideoTutorialsScreen extends StatelessWidget {
   const VideoTutorialsScreen({super.key});
 
-  static const Color azulOscuro = Color.fromARGB(255, 13, 28, 53);
+  static const Color azulOscuro = Color(0xFFF9A825);
   static const Color beigeClaro = Color.fromARGB(255, 247, 242, 235);
 
   String _getYoutubeThumbnail(String url) {
@@ -85,14 +85,15 @@ class VideoTutorialsScreen extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: azulOscuro,
+                          color: Color.fromARGB(255, 65, 42, 7),
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         video.description,
                         style: TextStyle(
-                          color: azulOscuro.withOpacity(0.7),
+                          color: const Color.fromARGB(255, 61, 38, 0)
+                              .withOpacity(0.7),
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -101,13 +102,15 @@ class VideoTutorialsScreen extends StatelessWidget {
                           Icon(
                             Icons.access_time,
                             size: 16,
-                            color: azulOscuro.withOpacity(0.7),
+                            color: const Color.fromARGB(255, 102, 63, 0)
+                                .withOpacity(0.7),
                           ),
                           const SizedBox(width: 4),
                           Text(
                             video.duration,
                             style: TextStyle(
-                              color: azulOscuro.withOpacity(0.7),
+                              color: const Color.fromARGB(255, 85, 52, 0)
+                                  .withOpacity(0.7),
                               fontSize: 12,
                             ),
                           ),
